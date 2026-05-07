@@ -1,0 +1,31 @@
+disease,urgency,fever,cough,fatigue,headache,sore_throat,shortness_of_breath,chest_pain,nausea,vomiting,diarrhea,rash,joint_pain,dizziness
+Common Cold,Low,0,1,1,1,1,0,0,0,0,0,0,0,0
+Influenza,Medium,1,1,1,1,1,0,0,1,0,0,0,1,0
+COVID-19,Medium,1,1,1,1,1,1,0,1,0,1,0,1,0
+Pneumonia,High,1,1,1,0,0,1,1,0,0,0,0,0,1
+Gastroenteritis,Medium,1,0,1,0,0,0,0,1,1,1,0,0,1
+Migraine,Medium,0,0,1,1,0,0,0,1,1,0,0,0,1
+Dengue,High,1,0,1,1,0,0,0,1,1,0,1,1,1
+Allergic Reaction,Medium,0,1,0,0,1,1,0,0,0,0,1,0,1
+Cardiac Warning,High,0,0,1,0,0,1,1,1,0,0,0,0,1
+Food Poisoning,Medium,1,0,1,1,0,0,0,1,1,1,0,0,1
+Common Cold,Low,0,1,0,1,1,0,0,0,0,0,0,0,0
+Common Cold,Low,0,1,1,0,1,0,0,0,0,0,0,0,0
+Influenza,Medium,1,1,1,1,0,0,0,1,0,0,0,1,0
+Influenza,Medium,1,1,1,0,1,0,0,0,0,0,0,1,1
+COVID-19,Medium,1,1,1,0,1,1,0,0,0,1,0,1,0
+COVID-19,Medium,1,1,1,1,0,1,0,1,0,0,0,0,1
+Pneumonia,High,1,1,1,0,0,1,1,1,0,0,0,0,1
+Pneumonia,High,1,1,0,0,0,1,1,0,0,0,0,0,0
+Gastroenteritis,Medium,1,0,1,1,0,0,0,1,1,1,0,0,0
+Gastroenteritis,Medium,0,0,1,0,0,0,0,1,1,1,0,0,1
+Migraine,Medium,0,0,1,1,0,0,0,1,0,0,0,0,1
+Migraine,Medium,0,0,0,1,0,0,0,1,1,0,0,0,1
+Dengue,High,1,0,1,1,0,0,0,1,0,0,1,1,1
+Dengue,High,1,0,1,1,0,0,0,0,1,0,1,1,0
+Allergic Reaction,Medium,0,1,0,0,1,1,0,0,0,0,1,0,0
+Allergic Reaction,Medium,0,1,1,0,1,0,0,0,0,0,1,0,1
+Cardiac Warning,High,0,0,1,0,0,1,1,1,1,0,0,0,1
+Cardiac Warning,High,0,0,0,0,0,1,1,0,0,0,0,0,1
+Food Poisoning,Medium,1,0,1,0,0,0,0,1,1,1,0,0,0
+Food Poisoning,Medium,0,0,1,1,0,0,0,1,1,1,0,0,1
