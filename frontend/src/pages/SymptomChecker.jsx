@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Autocomplete, Button, Chip, TextField } from "@mui/material";
+import { ActivitySquare, ClipboardCheck, Search, ShieldAlert, Sparkles } from "lucide-react";
 import { api } from "../api/client";
 import StatusBanner from "../components/StatusBanner";
 
@@ -30,8 +31,13 @@ export default function SymptomChecker() {
   return (
     <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
       <div className="panel p-5">
-        <h2 className="mb-1 text-xl font-black">Symptom Analysis Agent</h2>
-        <p className="mb-5 text-sm text-slate-600">Select observed symptoms for ML-based triage support.</p>
+        <div className="section-title mb-5">
+          <span className="icon-badge"><ActivitySquare size={22} /></span>
+          <div>
+            <h2 className="text-xl font-black">Symptom Analysis Agent</h2>
+            <p className="text-sm text-slate-600">Select observed symptoms for ML-based triage support.</p>
+          </div>
+        </div>
         {error && <div className="mb-4"><StatusBanner type="error">{error}</StatusBanner></div>}
         <Autocomplete
           multiple
@@ -41,14 +47,17 @@ export default function SymptomChecker() {
           renderTags={(value, getTagProps) => value.map((option, index) => <Chip variant="outlined" label={option.replaceAll("_", " ")} {...getTagProps({ index })} key={option} />)}
           renderInput={(params) => <TextField {...params} label="Symptoms" placeholder="Search symptoms" />}
         />
-        <Button className="mt-4" variant="contained" disabled={!symptoms.length || loading} onClick={submit}>{loading ? "Analyzing" : "Run prediction"}</Button>
+        <Button className="mt-4" variant="contained" disabled={!symptoms.length || loading} onClick={submit} startIcon={loading ? <Sparkles size={17} /> : <Search size={17} />}>{loading ? "Analyzing" : "Run prediction"}</Button>
       </div>
       <div className="panel p-5">
-        <h3 className="mb-4 text-lg font-black">Result</h3>
+        <div className="section-title mb-4">
+          <span className="icon-badge-soft"><ClipboardCheck size={18} /></span>
+          <h3 className="text-lg font-black">Result</h3>
+        </div>
         {result ? (
           <div className="space-y-3">
             <div><p className="text-xs font-bold uppercase text-slate-500">Predicted condition</p><p className="text-2xl font-black text-ink">{result.disease}</p></div>
-            <div><p className="text-xs font-bold uppercase text-slate-500">Urgency</p><p className={`text-xl font-black ${result.urgency === "High" ? "text-red-600" : result.urgency === "Medium" ? "text-amber-600" : "text-emerald-700"}`}>{result.urgency}</p></div>
+            <div><p className="text-xs font-bold uppercase text-slate-500">Urgency</p><p className={`flex items-center gap-2 text-xl font-black ${result.urgency === "High" ? "text-red-600" : result.urgency === "Medium" ? "text-purple-700" : "text-green-700"}`}><ShieldAlert size={20} />{result.urgency}</p></div>
             <p className="text-sm font-semibold text-slate-700">Confidence: {(result.confidence * 100).toFixed(1)}%</p>
             {result.recommendations.map((item) => <StatusBanner key={item}>{item}</StatusBanner>)}
           </div>

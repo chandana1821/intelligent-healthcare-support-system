@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, TextField } from "@mui/material";
+import { Save, UserRoundPlus } from "lucide-react";
 import { api } from "../api/client";
 import StatusBanner from "../components/StatusBanner";
 
@@ -15,9 +16,12 @@ export default function PatientForm() {
 
   return (
     <form onSubmit={submit} className="panel max-w-3xl space-y-4 p-5">
-      <div>
-        <h2 className="text-xl font-black">Patient Data Intake</h2>
-        <p className="text-sm text-slate-600">Validated records are stored in the patients collection.</p>
+      <div className="section-title">
+        <span className="icon-badge"><UserRoundPlus size={22} /></span>
+        <div>
+          <h2 className="text-xl font-black">Patient Data Intake</h2>
+          <p className="text-sm text-slate-600">Validated records are stored in the patients collection.</p>
+        </div>
       </div>
       {status && <StatusBanner type="success">{status}</StatusBanner>}
       <div className="grid gap-4 md:grid-cols-2">
@@ -29,7 +33,7 @@ export default function PatientForm() {
         <TextField label="Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
       </div>
       <TextField fullWidth label="Medical history" helperText="Comma separated" value={form.medical_history} onChange={(e) => setForm({ ...form, medical_history: e.target.value })} />
-      <Button type="submit" variant="contained">Store record</Button>
+      <Button type="submit" variant="contained" startIcon={<Save size={17} />}>Store record</Button>
     </form>
   );
 }

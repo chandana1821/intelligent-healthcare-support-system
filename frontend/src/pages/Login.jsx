@@ -67,12 +67,14 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-clinical p-4">
-      <form onSubmit={submit} className="panel w-full max-w-md p-6 shadow-sm">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 p-4">
+      <form onSubmit={submit} className="panel w-full max-w-md p-6">
         
         {/* HEADER */}
-        <div className="mb-5 flex items-center gap-3">
-          <ShieldCheck className="text-brand" size={30} />
+        <div className="mb-5 flex items-center gap-3 rounded-lg bg-gradient-to-r from-blue-50 via-white to-teal-50 p-3 ring-1 ring-blue-100">
+          <span className="grid h-12 w-12 place-items-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-500/20">
+            <ShieldCheck size={28} />
+          </span>
           <div>
             <h1 className="text-2xl font-black text-ink">
               CareSphere AI
@@ -84,14 +86,14 @@ export default function Login() {
         </div>
 
         {/* TOGGLE */}
-        <div className="mb-4 grid grid-cols-2 rounded-md bg-slate-100 p-1">
+        <div className="mb-4 grid grid-cols-2 rounded-lg bg-slate-100 p-1 ring-1 ring-slate-200">
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={`rounded px-3 py-2 text-sm font-bold ${
+            className={`rounded-md px-3 py-2 text-sm font-bold transition-all duration-200 ${
               mode === "login"
-                ? "bg-white text-brand shadow-sm"
-                : "text-slate-600"
+                ? "bg-white text-brand shadow-md"
+                : "text-slate-600 hover:bg-white/70 hover:text-blue-800"
             }`}
           >
             Login
@@ -100,10 +102,10 @@ export default function Login() {
           <button
             type="button"
             onClick={() => setMode("register")}
-            className={`rounded px-3 py-2 text-sm font-bold ${
+            className={`rounded-md px-3 py-2 text-sm font-bold transition-all duration-200 ${
               mode === "register"
-                ? "bg-white text-brand shadow-sm"
-                : "text-slate-600"
+                ? "bg-white text-brand shadow-md"
+                : "text-slate-600 hover:bg-white/70 hover:text-blue-800"
             }`}
           >
             Register

@@ -3,9 +3,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: "#0f766e",
-        ink: "#172026",
-        clinical: "#f5fbfa"
+        brand: "#2563eb",
+        ink: "#111827",
+        clinical: "#f9fafb",
+        tealcare: "#14b8a6",
+        aiaccent: "#7c3aed"
       }
     }
   },

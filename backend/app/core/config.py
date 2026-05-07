@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     llm_provider: str = "mock"
 
+    azure_openai_api_key: str | None = None
+    azure_openai_endpoint: str | None = None
+    azure_openai_api_version: str | None = None
+    azure_openai_deployment_name: str | None = None
+
     razorpay_key_id: str | None = None
     razorpay_key_secret: str | None = None
     razorpay_webhook_secret: str | None = None

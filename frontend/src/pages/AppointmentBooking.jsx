@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, MenuItem, TextField } from "@mui/material";
+import { BadgeIndianRupee, CalendarPlus, CreditCard, ShieldCheck } from "lucide-react";
 import { api } from "../api/client";
 import StatusBanner from "../components/StatusBanner";
 
@@ -195,13 +196,18 @@ export default function AppointmentBooking() {
     <section className="grid gap-5 lg:grid-cols-[1fr_360px]">
       <form onSubmit={submit} className="panel space-y-4 p-5">
         <div>
-          <h2 className="text-xl font-black">
-            Booking Appointment Agent
-          </h2>
+          <div className="section-title">
+            <span className="icon-badge"><CalendarPlus size={22} /></span>
+            <div>
+              <h2 className="text-xl font-black">
+                Booking Appointment Agent
+              </h2>
 
-          <p className="text-sm text-slate-600">
-            Creates the appointment and initializes a Razorpay order.
-          </p>
+              <p className="text-sm text-slate-600">
+                Creates the appointment and initializes a Razorpay order.
+              </p>
+            </div>
+          </div>
         </div>
 
         {error && (
@@ -305,6 +311,7 @@ export default function AppointmentBooking() {
           type="submit"
           variant="contained"
           disabled={loading}
+          startIcon={loading ? <CreditCard size={17} /> : <CalendarPlus size={17} />}
         >
           {loading ? "Processing Payment" : "Pay and Confirm Booking"}
         </Button>
@@ -312,14 +319,17 @@ export default function AppointmentBooking() {
 
       {/* Payment Section */}
       <div className="panel p-5">
-        <h3 className="mb-4 text-lg font-black">
-          Payment
-        </h3>
+        <div className="section-title mb-4">
+          <span className="icon-badge-soft"><BadgeIndianRupee size={18} /></span>
+          <h3 className="text-lg font-black">
+            Payment
+          </h3>
+        </div>
 
         {booking?.status === "confirmed" ? (
           <div className="space-y-3 text-sm">
             <StatusBanner type="success">
-              Payment successful. Appointment confirmed.
+              <span className="inline-flex items-center gap-2"><ShieldCheck size={16} />Payment successful. Appointment confirmed.</span>
             </StatusBanner>
 
             <p>

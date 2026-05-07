@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button, TextField } from "@mui/material";
+import { Activity, BarChart3, CalendarClock, HeartPulse, IndianRupee, LineChart as LineChartIcon, Stethoscope, UsersRound } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../api/client";
 import { useAuth } from "../auth/AuthContext";
@@ -47,8 +48,13 @@ export default function Dashboard() {
     return (
       <section className="space-y-5">
         <div className="panel p-5">
-          <h2 className="text-xl font-black">Patient Workspace</h2>
-          <p className="text-sm text-slate-600">Track bookings, run symptom checks, and continue assistant conversations.</p>
+          <div className="section-title">
+            <span className="icon-badge"><HeartPulse size={22} /></span>
+            <div>
+              <h2 className="text-xl font-black">Patient Workspace</h2>
+              <p className="text-sm text-slate-600">Track bookings, run symptom checks, and continue assistant conversations.</p>
+            </div>
+          </div>
         </div>
         <AppointmentTable rows={appointments} />
       </section>
@@ -77,7 +83,10 @@ export default function Dashboard() {
 function AdminSettings({ amount, onAmountChange, onSave, status }) {
   return (
     <div className="panel p-5">
-      <h2 className="text-lg font-black">Appointment Fee</h2>
+      <div className="section-title mb-2">
+        <span className="icon-badge-soft"><IndianRupee size={19} /></span>
+        <h2 className="text-lg font-black">Appointment Fee</h2>
+      </div>
       <p className="mb-4 text-sm text-slate-600">Patients can view this amount during booking, but only admin can change it.</p>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
         <TextField
@@ -87,7 +96,7 @@ function AdminSettings({ amount, onAmountChange, onSave, status }) {
           onChange={(event) => onAmountChange(event.target.value)}
           inputProps={{ min: 1 }}
         />
-        <Button variant="contained" onClick={onSave}>Save Fee</Button>
+        <Button variant="contained" onClick={onSave} startIcon={<IndianRupee size={17} />}>Save Fee</Button>
       </div>
       {status && <p className="mt-3 text-sm font-semibold text-slate-600">{status}</p>}
     </div>
@@ -97,18 +106,18 @@ function AdminSettings({ amount, onAmountChange, onSave, status }) {
 export function AnalyticsGrid({ analytics }) {
   return (
     <div className="grid gap-5 lg:grid-cols-2">
-      <ChartPanel title="Top Diseases">
+      <ChartPanel title="Top Diseases" icon={Stethoscope}>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={analytics?.top_diseases || []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="disease" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="count" fill="#0f766e" />
+          <Bar dataKey="count" fill="#2563eb" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </ChartPanel>
-      <ChartPanel title="Patient Inflow">
+      <ChartPanel title="Patient Inflow" icon={LineChartIcon}>
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={analytics?.patient_inflow || []}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -116,29 +125,29 @@ export function AnalyticsGrid({ analytics }) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={2} />
+            <Line type="monotone" dataKey="count" stroke="#14b8a6" strokeWidth={3} dot={{ fill: "#2563eb", strokeWidth: 2 }} />
           </LineChart>
         </ResponsiveContainer>
       </ChartPanel>
-      <ChartPanel title="Urgency Levels">
+      <ChartPanel title="Urgency Levels" icon={Activity}>
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={analytics?.urgency_distribution || []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="urgency" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="count" fill="#b45309" />
+            <Bar dataKey="count" fill="#7c3aed" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </ChartPanel>
-      <ChartPanel title="Symptom Trends">
+      <ChartPanel title="Symptom Trends" icon={BarChart3}>
         <ResponsiveContainer width="100%" height={260}>
           <BarChart data={analytics?.symptom_trends || []}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="symptom" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="count" fill="#2563eb" />
+            <Bar dataKey="count" fill="#16a34a" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </ChartPanel>
@@ -146,10 +155,13 @@ export function AnalyticsGrid({ analytics }) {
   );
 }
 
-function ChartPanel({ title, children }) {
+function ChartPanel({ title, icon: Icon, children }) {
   return (
     <div className="panel p-5">
-      <h2 className="mb-4 text-lg font-black">{title}</h2>
+      <div className="section-title mb-4">
+        {Icon && <span className="icon-badge-soft"><Icon size={18} /></span>}
+        <h2 className="text-lg font-black">{title}</h2>
+      </div>
       {children}
     </div>
   );
@@ -159,7 +171,10 @@ export function AppointmentTable({ rows, title = "Appointments" }) {
   return (
     <div className="panel overflow-hidden">
       <div className="border-b border-slate-200 p-4">
-        <h2 className="text-lg font-black">{title}</h2>
+        <div className="section-title">
+          <span className="icon-badge-soft"><CalendarClock size={18} /></span>
+          <h2 className="text-lg font-black">{title}</h2>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
@@ -187,7 +202,10 @@ function PatientTable({ rows }) {
   return (
     <div className="panel overflow-hidden">
       <div className="border-b border-slate-200 p-4">
-        <h2 className="text-lg font-black">Patients Data Board</h2>
+        <div className="section-title">
+          <span className="icon-badge-soft"><UsersRound size={18} /></span>
+          <h2 className="text-lg font-black">Patients Data Board</h2>
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">

@@ -62,6 +62,7 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
+    reply: str
     answer: str
     sources: list[str]
 

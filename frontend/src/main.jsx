@@ -15,8 +15,11 @@ import DoctorAppointments from "./pages/DoctorAppointments";
 
 const theme = createTheme({
   palette: {
-    primary: { main: "#0f766e" },
-    secondary: { main: "#2563eb" }
+    primary: { main: "#2563eb", light: "#60a5fa", dark: "#1e40af" },
+    secondary: { main: "#14b8a6", light: "#5eead4", dark: "#0f766e" },
+    success: { main: "#16a34a" },
+    warning: { main: "#d97706" },
+    error: { main: "#dc2626" }
   },
   shape: { borderRadius: 6 },
   typography: { fontFamily: "Inter, system-ui, sans-serif" }
