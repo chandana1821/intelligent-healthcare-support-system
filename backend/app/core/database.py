@@ -34,6 +34,9 @@ async def ensure_indexes() -> None:
         return
     await mongo.db.patients.create_index("email", unique=True)
     await mongo.db.users.create_index("email", unique=True)
+    await mongo.db.doctors.create_index("email")
+    await mongo.db.available_doctors.create_index("email", unique=True)
     await mongo.db.appointments.create_index([("doctor_email", 1), ("scheduled_for", 1)])
+    await mongo.db.appointments.create_index("razorpay_payment_id", unique=True, sparse=True)
     await mongo.db.predictions.create_index([("patient_id", 1), ("created_at", -1)])
     await mongo.db.chat_history.create_index([("patient_id", 1), ("created_at", -1)])

@@ -12,6 +12,12 @@ import Dashboard from "./pages/Dashboard";
 import PatientForm from "./pages/PatientForm";
 import AppointmentBooking from "./pages/AppointmentBooking";
 import DoctorAppointments from "./pages/DoctorAppointments";
+import AdminAppointments from "./pages/admin/AdminAppointments";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminDoctors from "./pages/admin/AdminDoctors";
+import AdminPatients from "./pages/admin/AdminPatients";
+import AdminRevenue from "./pages/admin/AdminRevenue";
+import AdminUploads from "./pages/admin/AdminUploads";
 
 const theme = createTheme({
   palette: {
@@ -36,6 +42,11 @@ function RoleRoute({ roles, children }) {
   return roles.includes(session.role) ? children : <Navigate to="/" replace />;
 }
 
+function Home() {
+  const { session } = useAuth();
+  return session?.role === "admin" ? <Navigate to="/admin" replace /> : <Dashboard />;
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
@@ -44,12 +55,18 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Protected><AppShell /></Protected>}>
-              <Route index element={<Dashboard />} />
+              <Route index element={<Home />} />
               <Route path="symptoms" element={<RoleRoute roles={["patient"]}><SymptomChecker /></RoleRoute>} />
               <Route path="chat" element={<RoleRoute roles={["patient"]}><Chatbot /></RoleRoute>} />
               <Route path="patient" element={<RoleRoute roles={["patient"]}><PatientForm /></RoleRoute>} />
               <Route path="appointments" element={<RoleRoute roles={["patient"]}><AppointmentBooking /></RoleRoute>} />
               <Route path="doctor-appointments" element={<RoleRoute roles={["doctor"]}><DoctorAppointments /></RoleRoute>} />
+              <Route path="admin" element={<RoleRoute roles={["admin"]}><AdminDashboard /></RoleRoute>} />
+              <Route path="admin/patients" element={<RoleRoute roles={["admin"]}><AdminPatients /></RoleRoute>} />
+              <Route path="admin/doctors" element={<RoleRoute roles={["admin"]}><AdminDoctors /></RoleRoute>} />
+              <Route path="admin/appointments" element={<RoleRoute roles={["admin"]}><AdminAppointments /></RoleRoute>} />
+              <Route path="admin/revenue" element={<RoleRoute roles={["admin"]}><AdminRevenue /></RoleRoute>} />
+              <Route path="admin/upload" element={<RoleRoute roles={["admin"]}><AdminUploads /></RoleRoute>} />
             </Route>
           </Routes>
         </BrowserRouter>

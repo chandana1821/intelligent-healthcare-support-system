@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import (
+    routes_admin,
     routes_analytics,
     routes_appointments,
     routes_auth,
@@ -13,7 +14,7 @@ from app.api import (
     routes_settings,
 )
 
-# ✅ FIXED IMPORT
+# IMPORT
 from app.api.routes_doctors import router as doctors_router
 
 from app.core.config import get_settings
@@ -26,13 +27,13 @@ logging.basicConfig(
 
 settings = get_settings()
 
-# ✅ Create FastAPI app
+#  Creating FastAPI app
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0"
 )
 
-# ✅ CORS Configuration
+# CORS Configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -50,17 +51,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Startup Event
+#  Startup Event
 @app.on_event("startup")
 async def startup() -> None:
     await connect_to_mongo()
 
-# ✅ Shutdown Event
+#  Shutdown Event
 @app.on_event("shutdown")
 async def shutdown() -> None:
     await close_mongo_connection()
 
-# ✅ Health Check
+#  Health Check
 @app.get("/health")
 async def health() -> dict:
     return {
@@ -68,7 +69,7 @@ async def health() -> dict:
         "service": settings.app_name
     }
 
-# ✅ Include Routers WITHOUT PREFIX
+#  Include Routers WITHOUT PREFIX
 app.include_router(routes_auth.router, prefix=settings.api_v1_prefix)
 app.include_router(routes_patients.router, prefix=settings.api_v1_prefix)
 app.include_router(routes_predictions.router, prefix=settings.api_v1_prefix)
@@ -76,6 +77,7 @@ app.include_router(routes_chat.router, prefix=settings.api_v1_prefix)
 app.include_router(routes_appointments.router, prefix=settings.api_v1_prefix)
 app.include_router(routes_analytics.router, prefix=settings.api_v1_prefix)
 app.include_router(routes_settings.router, prefix=settings.api_v1_prefix)
+app.include_router(routes_admin.router, prefix=settings.api_v1_prefix)
 
-# ✅ Doctors Router
+# Doctors Router
 app.include_router(doctors_router, prefix=settings.api_v1_prefix)

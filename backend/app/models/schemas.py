@@ -44,6 +44,29 @@ class PatientUpload(BaseModel):
     medical_history: list[str] = []
 
 
+class PatientAdminUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=120)
+    email: EmailStr | None = None
+    phone: str | None = None
+    age: int | None = Field(default=None, ge=0, le=125)
+    gender: str | None = None
+    address: str | None = None
+    medical_history: list[str] | None = None
+
+
+class DoctorAdminUpsert(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    password: str | None = Field(default=None, min_length=8, max_length=128)
+    phone: str | None = None
+    specialization: str = Field(min_length=2, max_length=120)
+    experience: int | None = Field(default=None, ge=0, le=70)
+    qualification: str | None = None
+    consultation_fee: int = Field(default=500, ge=0)
+    availability_status: str = "Available"
+    profile_image: str | None = None
+
+
 class PredictRequest(BaseModel):
     symptoms: list[str] = Field(min_length=1)
     patient_id: str | None = None
@@ -81,10 +104,16 @@ class AppointmentUpdate(BaseModel):
 
 
 class AppointmentPaymentVerify(BaseModel):
-    appointment_id: str
+    booking_token: str
     razorpay_order_id: str
     razorpay_payment_id: str
     razorpay_signature: str
+
+
+class AppointmentDemoPayment(BaseModel):
+    booking_token: str
+    razorpay_order_id: str
+    demo_upi_id: str = Field(min_length=3, max_length=120)
 
 
 class AnalyticsResponse(BaseModel):

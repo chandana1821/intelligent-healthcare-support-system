@@ -23,7 +23,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Auto redirect if already logged in
+  //  Auto redirect if already logged in
   if (session) return <Navigate to="/" replace />;
 
   const submit = async (event) => {
@@ -42,7 +42,7 @@ export default function Login() {
           age: form.age ? Number(form.age) : null,
         });
 
-        // ✅ FORCE REDIRECT AFTER REGISTER
+        // FORCE REDIRECT AFTER REGISTER
         window.location.href = "/";
       }
     } catch (err) {

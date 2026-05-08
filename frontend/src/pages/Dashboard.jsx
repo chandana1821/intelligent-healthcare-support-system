@@ -167,7 +167,7 @@ function ChartPanel({ title, icon: Icon, children }) {
   );
 }
 
-export function AppointmentTable({ rows, title = "Appointments" }) {
+export function AppointmentTable({ rows, title = "Appointments", showStatus = true }) {
   return (
     <div className="panel overflow-hidden">
       <div className="border-b border-slate-200 p-4">
@@ -179,7 +179,12 @@ export function AppointmentTable({ rows, title = "Appointments" }) {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500">
-            <tr><th className="p-3">Patient</th><th className="p-3">Doctor</th><th className="p-3">Schedule</th><th className="p-3">Status</th></tr>
+            <tr>
+              <th className="p-3">Patient</th>
+              <th className="p-3">Doctor</th>
+              <th className="p-3">Schedule</th>
+              {showStatus && <th className="p-3">Status</th>}
+            </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
@@ -187,10 +192,10 @@ export function AppointmentTable({ rows, title = "Appointments" }) {
                 <td className="p-3 font-semibold">{row.patient_name || row.patient_email}</td>
                 <td className="p-3">{row.doctor_name || row.doctor_email}</td>
                 <td className="p-3">{row.scheduled_for ? new Date(row.scheduled_for).toLocaleString() : "-"}</td>
-                <td className="p-3"><span className="rounded bg-slate-100 px-2 py-1 font-bold">{row.status}</span></td>
+                {showStatus && <td className="p-3"><span className="rounded bg-slate-100 px-2 py-1 font-bold">{row.status}</span></td>}
               </tr>
             ))}
-            {!rows.length && <tr><td className="p-4 text-slate-500" colSpan="4">No appointments yet.</td></tr>}
+            {!rows.length && <tr><td className="p-4 text-slate-500" colSpan={showStatus ? 4 : 3}>No appointments yet.</td></tr>}
           </tbody>
         </table>
       </div>

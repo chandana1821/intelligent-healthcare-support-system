@@ -4,7 +4,7 @@ from app.services.doctor_service import list_available_doctors
 router = APIRouter(
     prefix="/doctors",
     tags=["doctors"],
-    dependencies=[]   # 🔥 FORCE NO AUTH
+    dependencies=[]   #  FORCE NO AUTH
 )
 
 @router.get("/")

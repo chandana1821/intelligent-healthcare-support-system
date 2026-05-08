@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, MenuItem, TextField } from "@mui/material";
-import { BadgeIndianRupee, CalendarPlus, CreditCard, ShieldCheck } from "lucide-react";
+import { BadgeIndianRupee, CalendarPlus, CheckCircle2, CreditCard, ShieldCheck, Smartphone } from "lucide-react";
 import { api } from "../api/client";
 import StatusBanner from "../components/StatusBanner";
 
@@ -57,10 +57,25 @@ export default function AppointmentBooking() {
   const [doctors, setDoctors] = useState([]);
   const [appointmentFee, setAppointmentFee] = useState(500);
   const [booking, setBooking] = useState(null);
+  const [demoUpiId, setDemoUpiId] = useState("");
+  const [slotAvailability, setSlotAvailability] = useState([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityRefresh, setAvailabilityRefresh] = useState(0);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Fetch doctors
+  const slots = useMemo(() => {
+    const availabilityByTime = new Map(slotAvailability.map((slot) => [slot.value, slot]));
+    return appointmentTimes.map((slot) => ({
+      ...slot,
+      ...(availabilityByTime.get(slot.value) || {}),
+    }));
+  }, [slotAvailability]);
+
+  const selectedSlot = slots.find((slot) => slot.value === form.time);
+  const selectedSlotUnavailable = Boolean(selectedSlot?.is_booked);
+
+  //  Fetch doctors
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -69,7 +84,7 @@ export default function AppointmentBooking() {
         console.log("DOCTORS RESPONSE:", response);
         console.log("DOCTORS DATA:", response.data);
 
-        // ✅ Ensure array
+        //  Ensure array
         if (Array.isArray(response.data)) {
           setDoctors(response.data);
         } else {
@@ -93,9 +108,48 @@ export default function AppointmentBooking() {
       .catch(() => setAppointmentFee(500));
   }, []);
 
-  // ✅ Create appointment
+  useEffect(() => {
+    if (!form.doctor_email || !form.date) {
+      setSlotAvailability([]);
+      return;
+    }
+
+    let active = true;
+    setAvailabilityLoading(true);
+    api.get("/appointments/availability", {
+      params: {
+        doctor_email: form.doctor_email,
+        appointment_date: form.date,
+      },
+    })
+      .then(({ data }) => {
+        if (!active) return;
+        const nextSlots = Array.isArray(data.slots) ? data.slots : [];
+        setSlotAvailability(nextSlots);
+        if (form.time && nextSlots.some((slot) => slot.value === form.time && slot.is_booked)) {
+          setForm((current) => ({ ...current, time: "" }));
+        }
+      })
+      .catch(() => {
+        if (active) setSlotAvailability([]);
+      })
+      .finally(() => {
+        if (active) setAvailabilityLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [form.doctor_email, form.date, form.time, availabilityRefresh]);
+
+  //  Create appointment
   const submit = async (event) => {
-    event.preventDefault();
+    event?.preventDefault();
+    if (loading) return;
+    if (selectedSlotUnavailable) {
+      setError("This slot is already booked for the selected doctor and date. Please choose an available time.");
+      return;
+    }
 
     setError("");
     setLoading(true);
@@ -108,16 +162,32 @@ export default function AppointmentBooking() {
         reason: form.reason,
       });
 
-      console.log("APPOINTMENT RESPONSE:", data);
+      if (!data.order?.id || !data.order?.amount) {
+        throw new Error("Razorpay order was not created correctly by the backend.");
+      }
+      if (!data.booking_token) {
+        throw new Error("Secure booking session was not created. Please try again.");
+      }
+
+      const trimmedDemoUpiId = demoUpiId.trim();
+      if (trimmedDemoUpiId) {
+        const verify = await api.post("/appointments/payment/demo", {
+          booking_token: data.booking_token,
+          razorpay_order_id: data.order.id,
+          demo_upi_id: trimmedDemoUpiId,
+        });
+        setBooking({ ...data, appointment_id: verify.data.appointment_id, verification: verify.data, status: "confirmed", demo_upi_id: trimmedDemoUpiId });
+        setAvailabilityRefresh((value) => value + 1);
+        setError("");
+        setLoading(false);
+        return;
+      }
 
       await loadRazorpayCheckout();
 
       const razorpayKey = data.order?.key_id || import.meta.env.VITE_RAZORPAY_KEY_ID;
       if (!razorpayKey || razorpayKey === "rzp_test_demo") {
-        throw new Error("Razorpay key is not configured. Set VITE_RAZORPAY_KEY_ID in frontend/.env.");
-      }
-      if (!data.order?.id || !data.order?.amount) {
-        throw new Error("Razorpay order was not created correctly by the backend.");
+        throw new Error("Razorpay test key is not configured. Set Razorpay test keys in backend/.env and VITE_RAZORPAY_KEY_ID in frontend/.env.");
       }
 
       const checkout = new window.Razorpay({
@@ -144,12 +214,14 @@ export default function AppointmentBooking() {
         handler: async (response) => {
           try {
             const verify = await api.post("/appointments/payment/verify", {
-              appointment_id: data.appointment_id,
+              booking_token: data.booking_token,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
-            setBooking({ ...data, verification: verify.data, status: "confirmed" });
+            setBooking({ ...data, appointment_id: verify.data.appointment_id, verification: verify.data, status: "confirmed" });
+            setAvailabilityRefresh((value) => value + 1);
+            setError("");
           } catch (verifyError) {
             setError(verifyError.response?.data?.detail || "Payment verification failed. Appointment is not confirmed.");
           } finally {
@@ -163,7 +235,7 @@ export default function AppointmentBooking() {
           },
         },
         theme: {
-          color: "#0f766e",
+          color: "#2563eb",
         },
       });
 
@@ -204,7 +276,7 @@ export default function AppointmentBooking() {
               </h2>
 
               <p className="text-sm text-slate-600">
-                Creates the appointment and initializes a Razorpay order.
+                Opens Razorpay test checkout. Appointment is booked only after successful payment.
               </p>
             </div>
           </div>
@@ -228,6 +300,7 @@ export default function AppointmentBooking() {
               setForm({
                 ...form,
                 doctor_email: e.target.value,
+                time: "",
               })
             }
           >
@@ -259,6 +332,7 @@ export default function AppointmentBooking() {
               setForm({
                 ...form,
                 date: e.target.value,
+                time: "",
               })
             }
           />
@@ -269,6 +343,13 @@ export default function AppointmentBooking() {
             label="Time"
             required
             value={form.time}
+            helperText={
+              form.doctor_email && form.date
+                ? availabilityLoading
+                  ? "Checking slot availability..."
+                  : "Booked slots stay visible but cannot be selected."
+                : "Select a doctor and date to check unavailable slots."
+            }
             onChange={(e) =>
               setForm({
                 ...form,
@@ -276,9 +357,21 @@ export default function AppointmentBooking() {
               })
             }
           >
-            {appointmentTimes.map((slot) => (
-              <MenuItem key={slot.value} value={slot.value}>
-                {slot.label}
+            {slots.map((slot) => (
+              <MenuItem
+                key={slot.value}
+                value={slot.value}
+                disabled={slot.is_booked}
+                sx={{
+                  "&.Mui-disabled": {
+                    bgcolor: "#cbd5e1",
+                    color: "#1f2937",
+                    fontWeight: 800,
+                    opacity: 1,
+                  },
+                }}
+              >
+                {slot.label}{slot.is_booked ? " - unavailable" : ""}
               </MenuItem>
             ))}
           </TextField>
@@ -310,10 +403,10 @@ export default function AppointmentBooking() {
         <Button
           type="submit"
           variant="contained"
-          disabled={loading}
+          disabled={loading || selectedSlotUnavailable}
           startIcon={loading ? <CreditCard size={17} /> : <CalendarPlus size={17} />}
         >
-          {loading ? "Processing Payment" : "Pay and Confirm Booking"}
+          {loading ? "Processing Payment" : demoUpiId.trim() ? "Complete Demo UPI Payment" : "Pay and Confirm Booking"}
         </Button>
       </form>
 
@@ -331,6 +424,11 @@ export default function AppointmentBooking() {
             <StatusBanner type="success">
               <span className="inline-flex items-center gap-2"><ShieldCheck size={16} />Payment successful. Appointment confirmed.</span>
             </StatusBanner>
+            <div className="rounded-lg bg-green-50 p-4 text-center ring-1 ring-green-100">
+              <CheckCircle2 className="mx-auto mb-2 text-green-700" size={34} />
+              <p className="text-lg font-black text-green-900">Payment Success</p>
+              <p className="text-xs font-semibold text-green-700">Your appointment is now booked.</p>
+            </div>
 
             <p>
               <b>Appointment:</b>{" "}
@@ -344,8 +442,14 @@ export default function AppointmentBooking() {
 
             <p>
               <b>Payment:</b>{" "}
-              {booking.verification?.status}
+              {booking.demo_upi_id ? "demo_upi_success" : booking.verification?.status}
             </p>
+            {booking.demo_upi_id && (
+              <p>
+                <b>Demo UPI:</b>{" "}
+                {booking.demo_upi_id}
+              </p>
+            )}
 
             <p>
               <b>Amount:</b> INR{" "}
@@ -355,9 +459,31 @@ export default function AppointmentBooking() {
             </p>
           </div>
         ) : (
-          <p className="text-sm text-slate-500">
-            Booking is confirmed only after successful Razorpay payment.
-          </p>
+          <div className="space-y-4 text-sm text-slate-500">
+            <div className="rounded-lg bg-slate-50 p-3 ring-1 ring-slate-200">
+              <div className="mb-3 flex items-center gap-2 font-black text-slate-800">
+                <Smartphone size={18} className="text-blue-700" />
+                Demo UPI ID
+              </div>
+              <TextField
+                fullWidth
+                size="small"
+                label="Enter demo UPI ID"
+                placeholder="success@demo"
+                value={demoUpiId}
+                onChange={(event) => setDemoUpiId(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    submit(event);
+                  }
+                }}
+                helperText="Use any test value like success@demo. Appointment is created only after this demo success action."
+              />
+            </div>
+            <p>Enter a demo UPI ID and click Pay and Confirm Booking to create a demo success payment.</p>
+            <p>Leave it blank to use the Razorpay test checkout. No appointment is stored if payment is cancelled, failed, closed, or left pending.</p>
+          </div>
         )}
       </div>
     </section>
