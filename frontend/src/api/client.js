@@ -1,7 +1,13 @@
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
+if (!apiUrl) {
+  throw new Error("VITE_API_URL is required. Set it to your deployed backend URL, for example https://<backend-app-name>.azurewebsites.net/api/v1");
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1"
+  baseURL: apiUrl,
 });
 
 api.interceptors.request.use((config) => {
